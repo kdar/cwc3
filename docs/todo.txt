@@ -1,0 +1,59 @@
+Bugs:
+
+Performance:   
+-- Do we have to use shared_ptr's everywhere? I think some performance is lost in called its constructor
+   and destructor so often in places like OnSlotTableUpdated. Maybe we should just use regular pointers in
+   places like these?
+
+Major:
+-- Keep a persistent database of clients in memory. Currently, once a new game starts the client list is
+   totally cleared. This is not good because if you start a new game, you can't ban someone from a past
+   game.. or you can't detect multiple ip very well. The class definition of a client might have to change
+   a little bit to accomodate this.
+
+-- Multiple IP kick doesn't work. Not exactly sure why.
+   
+-- There has GOT to be a better way to find out if someone left... banlist works right!
+
+Minor:
+-- Have commands to turn off auto kicks on ping/country/multiple ip.
+
+-- Capture chat text as well and display it on the interface.
+
+-- Auto kick on "weird" names (Such as names with numbers or a bunch of repeated letters).
+
+-- Auto kick on chat spam
+
+-- Make it so if someone leaves before game starts, do a sendkey with ESC to try to stop the game.
+
+Really Minor:
+-- Add a feature to grab your friend's list dynamically like banlist does and save it to the configuration file.
+
+-- Find a way to capture the heros people get and display it.
+
+-- Also capture game modes possibly? (very dota specific)
+
+-- Make structures for all the types of packets we can receive. E.g., for sending a command, we make this structure:
+   //FF 0E [size of data] 00 [/] [command]
+   struct SendCommand {
+     char destination;
+     char type;
+     u_short size;
+     char unknown1;
+     char slash;
+     char command[2048];
+   }
+   Better yet, we should have nested structures. First we have a structure for the whole packet, then the subpacket. Like:
+   struct WC3Packet {
+     char destination;
+     char type;
+     u_short size;
+     char subpacket[4068];
+   }
+   And then we have:
+   struct SendCommand {
+     char unknown1;
+     char slash;
+     char command[2048];
+   }
+   Problem is, how do we unserialize dynamic sized char arrays?

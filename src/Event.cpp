@@ -1,0 +1,4 @@
+#include "Event.h"
+
+IMPLEMENT_DYNAMIC_CLASS(NetEvent, wxEvent)
+DEFINE_EVENT_TYPE(EVT_NET_ACTION)

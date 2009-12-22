@@ -1,0 +1,148 @@
+<?xml version="1.0" ?>
+<makefile>
+
+ <set var="EXENAME">cwc3</set>
+ <set var="INCLUDE_CDK">/usr/include/cdk</set>
+
+ <option name="BUILD">
+   <values>debug, release</values>
+   <default-value>release</default-value>
+ </option>
+
+ <set var="OPTIMIZE_FLAG">
+   <if cond="BUILD=='release'">speed</if>
+   <if cond="BUILD=='debug'">off</if>
+ </set>
+
+ <set var="DEBUG_DEFINES">
+   <if cond="BUILD=='release'">DEBUG=0 -DWX_DEBUG=0</if>
+   <if cond="BUILD=='debug'">DEBUG=1 -D__WXDEBUG__ -DWXUSINGDLL_BASE</if>
+ </set>
+
+ <set var="DEBUG_INFO">
+   <if cond="BUILD=='release'"></if>
+   <if cond="BUILD=='debug'">-ggdb</if>
+ </set>
+
+ <option name="INTERFACE">
+   <values>text, cdk</values>
+   <default-value>cdk</default-value>
+ </option>
+
+ <set var="INTERFACE_DEFINES">
+   <if cond="INTERFACE=='text'">USE_INTERFACE_TEXT</if>
+   <if cond="INTERFACE=='cdk'">USE_INTERFACE_CDK</if>
+ </set>
+
+ <set var="INTERFACE_LIBS">
+   <if cond="INTERFACE=='text'"></if>
+   <if cond="INTERFACE=='cdk'">-lcdk -lncurses</if>
+ </set>
+
+ <set var="INTERFACE_INCLUDE">
+   <if cond="INTERFACE=='text'"></if>
+   <if cond="INTERFACE=='cdk'">$(INCLUDE_CDK)</if>
+ </set>
+
+ <set var="PLATFORM_DEFINES">
+   <if cond="PLATFORM_UNIX=='1'">PLATFORM_UNIX</if>
+   <if cond="PLATFORM_WIN32=='1'">PLATFORM_WIN32</if>
+   <if cond="PLATFORM_MSDOS=='1'">PLATFORM_MSDOS</if>
+   <if cond="PLATFORM_MAC=='1'">PLATFORM_MAC</if>
+   <if cond="PLATFORM_MACOSX=='1'">PLATFORM_MACOSX</if>
+   <if cond="PLATFORM_OS2=='1'">PLATFORM_OS2</if>
+   <if cond="PLATFORM_BEOS=='1'">PLATFORM_BEOS</if>
+   <if cond="PLATFORM_SYMBIAN=='1'">PLATFORM_SYMBIAN</if>
+ </set>
+
+ <include file="wx.bkl"/>
+
+ <!-- ================== -->
+ <!-- Building libraries -->
+ <!-- ================== -->
+
+ <set var="SRCDIR">lib/src</set>
+ <set var="BUILDDIR">lib/build</set>
+
+ <!--<lib id="wxXMLConfig" template="wx">
+   <runtime-libs>dynamic</runtime-libs>
+   <optimize>$(OPTIMIZE_FLAG)</optimize>
+   <threading>multi</threading>
+   <define>$(DEBUG_DEFINES)</define>
+   <define>$(PLATFORM_DEFINES)</define>
+
+   <cppflags>$(DEBUG_INFO) -fPIC</cppflags>
+
+   <libname>wxXMLConfig</libname>
+   <sources>wxXMLConfig.cpp</sources>
+   <include>lib/include</include>
+ </lib>-->
+
+ <!-- ================== -->
+ <!--   Building cwc3    -->
+ <!-- ================== -->
+
+ <set var="SRCDIR">src</set>
+ <set var="BUILDDIR">build</set> 
+ 
+ <exe id="cwc3" template="wx">
+  <exename>$(EXENAME)</exename>
+  <!--<depends>wxXMLConfig</depends>-->
+  <app-type>console</app-type>
+  <runtime-libs>dynamic</runtime-libs>
+  <optimize>$(OPTIMIZE_FLAG)</optimize>
+  <threading>multi</threading>
+  <define>$(INTERFACE_DEFINES)</define>
+  <define>$(DEBUG_DEFINES)</define>
+  <define>$(PLATFORM_DEFINES)</define>
+  
+  <cppflags>$(DEBUG_INFO)</cppflags>
+  <ldflags>$(DEBUG_INFO)</ldflags>
+
+  <sources>Main.cpp Game.cpp Interface.cpp</sources>
+  <sources>CommandHandler.cpp Functions.cpp Client.cpp ClientManager.cpp</sources>
+  <sources>PacketCapture.cpp TcpKill.cpp Config.cpp SlotManager.cpp</sources>
+  <sources>AutoRefresh.cpp Netclip.cpp</sources>
+  <sources>Slot.cpp Database.cpp IpInfo.cpp Info.cpp</sources>
+  <sources>Event.cpp NetEventDispatcher.cpp Command.cpp CoreCommands.cpp</sources>
+  
+  <sources>PhraseModule/PhraseModule.cpp</sources>
+  <sources>KickModule/KickModule.cpp KickModule/EnsureKick.cpp BanModule/BanModule.cpp</sources>
+  <sources>ExtraInfoModule/ExtraInfoModule.cpp</sources>
+  <sources>InjectModule/InjectModule.cpp</sources>
+  
+  <include>include</include>
+  <include>lib/include</include>
+  <include>$(INTERFACE_INCLUDE)</include>
+
+  <if cond="PLATFORM_WIN32=='1'">
+    <include>"$(DOLLAR)($(ENV_VAR)INCLUDE)"</include>
+  </if>
+
+  <if cond="PLATFORM_UNIX=='1'">
+    <postlink-command>mv build/$(EXENAME) dist/</postlink-command>
+  </if>
+  <if cond="PLATFORM_WIN32=='1'">
+    <postlink-command>move build\${EXENAME} dist\</postlink-command>
+  </if>
+  
+  <!--<lib-path>lib/</lib-path>
+  <sys-lib>sqlitewrapped</sys-lib>-->
+  
+  <!--<clean-files>$(EXENAME)</clean-files>-->
+
+  <wx-lib>net</wx-lib>
+  <wx-lib>base</wx-lib>
+
+  <!--<library>wxXMLConfig</library>-->
+
+  <sys-lib>pcap</sys-lib>
+  <sys-lib>sqlite3</sys-lib>
+  <!--<sys-lib>GeoIP</sys-lib>-->
+  <sys-lib>boost_regex</sys-lib>
+  <sys-lib>boost_system</sys-lib>
+  <sys-lib>net</sys-lib>
+  <ldlibs>$(INTERFACE_LIBS)</ldlibs>
+ </exe> 
+
+</makefile>

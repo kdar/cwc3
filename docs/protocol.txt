@@ -1,0 +1,48 @@
+--------------------
+WC3 protocol format:
+--------------------
+[1 byte destination number] [1 byte type number] [2 byte size of the data in network byte order (starting from the destination number)] [rest of packet data]
+
+Notes:
+- It seems to me that any found offset, is relative to where the start of the 2 byte destination number is.
+- Destination numbers prefixed with FF is data sent to/received from battle.net.
+- Destination numbers prefixed with F7 is data sent to/received from clients.
+- WC3 loves to combine packets. But this isn't a problem. We know that the first byte is the destination number,
+  the next byte is the type number, and next two bytes is the size. So, if we find that the size of the whole 
+  tcp packet data is bigger than the size reported by the 2-byte size, then we know we have more data to process.
+
+
+-------------
+AutoRefresher
+-------------
+
+Just to make a note on how the auto refresher works. First point to make is that
+wc3 keeps a counter on the host side for every game that it makes. When the game is
+first loaded, this counter is set to 0. It is incremented for every game that you make, the
+first game being 1. Now, each client that connects to a game must have this information, and the
+game gets it from the server list screen (when the list of games that are present are sent to the client,
+this number is with each game).
+
+So now the question is, if we want to make an autorefresher, how can we get this number? Well, it is
+encoded into the game creation packet. We'll take a look at a sample game creation packet:
+FF 1C 7B 00 10 00 00 00 00 00 00 00 01 20 49 00  ..{.......... I.
+FF 03 00 00 00 00 00 00 36 2E 34 33 62 20 2D 61  ........6.43b -a
+72 65 6D 20 62 61 6E 6C 69 73 74 00 00 39 61 30  rem banlist..9a0
+30 30 30 30 30 30 01 03 49 07 01 01 75 01 F9 75  000000..I...u..u
+01 F9 0D 49 E5 4D CB 61 71 73 5D 45 6F 77 19 6F  ...I.M.aqs]Eow.o
+6D 6F 61 65 5D 45 2B 6F 75 41 21 41 6D 6D 2B 73  moae]E+ouA!Amm+s
+75 61 73 73 21 77 91 37 2F 35 33 63 2F 77 23 33  uass!w.7/53c/w#3
+79 01 63 69 6F 65 03 73 01 01 00                 y.cioe.s...
+
+At offset 44, you see the hex numbers 61 30 30 30 30 30 30 30.
+Now, what this is, is an actual ascii representation of a hex value, but in network byte order.
+So first thing to do is to swap this sequence around to:
+30 30 30 30 30 30 30 61
+Now, using the ascii table we see that this is:
+0000000a
+So our number that we have to send is 0xa. You can use the strtoul function after you swap the sequence
+to get this number.
+
+Now, for the client connect packet (F7 1E), all we have to do is put this number at offset 4. The rest of the
+numbers aren't too significant, just sniff the network and get a F7 1E packet, then use the same packet except for
+offset 4 replaced with our hosted count number. And now our refresher can connect.

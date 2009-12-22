@@ -1,0 +1,1 @@
+astyle --style=ansi -s2 --brackets=linux --indent-classes --indent-switches --indent-labels -M --pad=oper --unpad=paren --one-line=keep-statements --one-line=keep-blocks --convert-tabs src/*.cpp include/*.h

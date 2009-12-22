@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/local/bin/bakefile -f gnu -o GNUmakefile build/bakefiles/cwc3.bkl

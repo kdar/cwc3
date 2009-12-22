@@ -1,0 +1,34 @@
+This is a text file explaining how shared_ptr works.
+I am doing this since I had some trouble getting it to work in the first place.
+
+The main idea is to create a shared pointer to a real pointer, then only use that shared pointer from then on.
+This means even if you are making other shared pointers to the same data. If we use the original pointer instead
+of the shared pointer, then you create two entities that count independently.
+This is what I mean:
+
+NO:
+int *original = new int;
+*original = 5;
+
+shared_ptr<int> ptr1(original);
+somefunc1(ptr1);
+
+shared_ptr<int> ptr2(original); //Wrong! Totally separate reference counter.
+somefunc2(ptr2);
+
+YES:
+int *original = new int;
+*original = 5;
+
+shared_ptr<int> ptr1(original);
+somefunc1(ptr1);
+
+shared_ptr<int> ptr2 = ptr1;
+somefunc2(ptr2);   //This is just to make a point, of course you can call somefunc2(ptr1);
+
+
+So, if you need multiple copies of the shared pointer, then only make them from the first shared pointer you make.
+This will garauntee that the memory allocated will be deallocated properly.
+Another note which emphasizes the above, if you have some kind of list of shared pointers, you only create
+a new shared pointer when you allocate an object using new, and you put that shared pointer in the list. If you want
+to return an item from the list, you return the shared pointer without creating a new one.

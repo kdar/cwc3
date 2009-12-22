@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#export DISTCC_HOSTS="localhost 192.168.0.3"
+#make -j1 CXX="distcc" BUILD=debug WX_CONFIG='wx-config --debug=yes'
+make -j1 CXX="ccache g++" BUILD=debug WX_CONFIG='wx-config --debug=yes'
