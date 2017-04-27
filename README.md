@@ -3,6 +3,10 @@ cwc3
 
 Gives more power and control to the host of a Warcraft III game. The main purpose of this program is to kick people from Warcraft III games since it is not implemented in the game itself. It also has several ways to automatically kick people based on certain parameters (If they're from the wrong country, they ping too high, etc..).
 
+![Screenshot1](https://github.com/kdar/cwc3/raw/master/doc/screenshot1.jpg)
+
+![Screenshot2](https://github.com/kdar/cwc3/raw/master/doc/screenshot2.jpg)
+
 # Discontinued
 
 This project is no longer developed. The reason being I was no longer interested in the game and there is a better method
